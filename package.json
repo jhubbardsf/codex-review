@@ -1,0 +1,19 @@
+{
+  "name": "codex-review",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Claude Code plugin marketplace for running Codex GPT-5.5 as an independent reviewer.",
+  "scripts": {
+    "test": "bun test",
+    "test:shell": "bun test test/run-codex-review.test.ts",
+    "test:plugin": "bun test test/plugin-manifest.test.ts",
+    "test:docs": "bun test test/docs.test.ts",
+    "validate:plugin": "bash scripts/validate-plugin.sh",
+    "test:all": "bun run test && bun run validate:plugin"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  }
+}
+

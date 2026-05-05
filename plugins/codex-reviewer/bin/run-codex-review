@@ -1,0 +1,171 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  run-codex-review [options] [uncommitted]
+  run-codex-review [options] base <branch>
+  run-codex-review [options] commit <sha>
+  run-codex-review [options] custom <review instructions...>
+
+Options:
+  --model <model>     Codex model to use. Default: CODEX_REVIEW_MODEL or gpt-5.5
+  --cwd <dir>         Repository directory. Default: current working directory
+  --output <file>     Where to write the final Codex report. Default: temp file
+  --no-ephemeral      Persist the Codex session instead of using --ephemeral
+  -h, --help          Show this help
+
+Examples:
+  run-codex-review
+  run-codex-review uncommitted
+  run-codex-review base origin/main
+  run-codex-review commit abc1234
+  run-codex-review custom Review uncommitted changes and focus on race conditions
+USAGE
+}
+
+die() {
+  echo "error: $*" >&2
+  exit 2
+}
+
+model="${CODEX_REVIEW_MODEL:-gpt-5.5}"
+codex_bin="${CODEX_REVIEW_CODEX_BIN:-codex}"
+cwd="$PWD"
+output=""
+ephemeral=1
+mode="uncommitted"
+target_value=""
+custom_prompt=""
+
+while (($#)); do
+  case "$1" in
+    --model)
+      (($# >= 2)) || die "--model requires a value"
+      model="$2"
+      shift 2
+      ;;
+    --cwd)
+      (($# >= 2)) || die "--cwd requires a directory"
+      cwd="$2"
+      shift 2
+      ;;
+    --output|-o)
+      (($# >= 2)) || die "--output requires a file path"
+      output="$2"
+      shift 2
+      ;;
+    --no-ephemeral)
+      ephemeral=0
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      mode="custom"
+      custom_prompt="$*"
+      break
+      ;;
+    uncommitted|--uncommitted)
+      mode="uncommitted"
+      shift
+      if (($#)); then
+        die "uncommitted review cannot be combined with custom instructions; use: custom <instructions>"
+      fi
+      break
+      ;;
+    base|--base)
+      (($# >= 2)) || die "base requires a branch/ref"
+      mode="base"
+      target_value="$2"
+      shift 2
+      if (($#)); then
+        die "base review cannot be combined with custom instructions; use: custom <instructions>"
+      fi
+      break
+      ;;
+    commit|--commit)
+      (($# >= 2)) || die "commit requires a SHA"
+      mode="commit"
+      target_value="$2"
+      shift 2
+      if (($#)); then
+        die "commit review cannot be combined with custom instructions; use: custom <instructions>"
+      fi
+      break
+      ;;
+    custom|--custom)
+      shift
+      (($# > 0)) || die "custom requires review instructions"
+      mode="custom"
+      custom_prompt="$*"
+      break
+      ;;
+    *)
+      mode="custom"
+      custom_prompt="$*"
+      break
+      ;;
+  esac
+done
+
+if [[ ! -d "$cwd" ]]; then
+  die "cwd does not exist: $cwd"
+fi
+
+if ! git -C "$cwd" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  die "cwd is not inside a git repository: $cwd"
+fi
+
+if ! command -v "$codex_bin" >/dev/null 2>&1; then
+  echo "error: codex CLI not found. Install and authenticate Codex, or set CODEX_REVIEW_CODEX_BIN." >&2
+  exit 127
+fi
+
+if [[ -z "$output" ]]; then
+  output="$(mktemp "${TMPDIR:-/tmp}/codex-review.XXXXXX")"
+else
+  mkdir -p "$(dirname "$output")"
+fi
+
+target_args=()
+case "$mode" in
+  uncommitted)
+    target_args=(--uncommitted)
+    ;;
+  base)
+    target_args=(--base "$target_value")
+    ;;
+  commit)
+    target_args=(--commit "$target_value")
+    ;;
+esac
+
+cmd=("$codex_bin" exec review -m "$model")
+if ((ephemeral)); then
+  cmd+=(--ephemeral)
+fi
+cmd+=("${target_args[@]}" -o "$output")
+
+if [[ "$mode" == "custom" ]]; then
+  cmd+=("Review only; do not edit files. $custom_prompt")
+fi
+
+echo "Running Codex reviewer in: $cwd" >&2
+echo "Target: $mode${target_value:+ $target_value}" >&2
+echo "Model: $model" >&2
+echo "Report: $output" >&2
+
+(
+  cd "$cwd"
+  "${cmd[@]}"
+)
+
+echo
+echo "Codex review report: $output"
+echo
+cat "$output"

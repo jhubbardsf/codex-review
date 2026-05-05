@@ -1,0 +1,24 @@
+{
+  "name": "codex-review",
+  "owner": {
+    "name": "Josh Hubbard",
+    "email": "jhubbardsf@users.noreply.github.com"
+  },
+  "description": "Claude Code plugins for delegating review work to Codex.",
+  "plugins": [
+    {
+      "name": "codex-reviewer",
+      "source": "./plugins/codex-reviewer",
+      "description": "Run Codex GPT-5.5 as an independent code reviewer from Claude Code.",
+      "author": {
+        "name": "Josh Hubbard"
+      },
+      "homepage": "https://jhubbardsf.github.io/codex-review/",
+      "repository": "https://github.com/jhubbardsf/codex-review",
+      "license": "MIT",
+      "category": "development-workflow",
+      "tags": ["codex", "review", "code-review", "gpt-5.5", "claude-code"]
+    }
+  ]
+}
+

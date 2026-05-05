@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>codex-review - Codex reviews inside Claude Code</title>
+  <meta name="description" content="A Claude Code plugin that runs Codex GPT-5.5 as an independent code reviewer.">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #090909;
+      --surface: #141414;
+      --surface-2: #1b1b1b;
+      --border: #2a2a2a;
+      --text: #f8fafc;
+      --muted: #a3a3a3;
+      --soft: #737373;
+      --accent: #f97316;
+      --accent-hover: #fb923c;
+      --green: #22c55e;
+      --blue: #60a5fa;
+      --red: #ef4444;
+      --code: #111111;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      background: rgba(9, 9, 9, 0.92);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(12px);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 64px;
+      gap: 20px;
+    }
+
+    .brand {
+      font-weight: 800;
+      letter-spacing: 0;
+      font-size: 18px;
+    }
+
+    .brand span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .hero {
+      padding: 64px 0 44px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
+      gap: 44px;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero > * { min-width: 0; }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 6vw, 4.25rem);
+      line-height: 1.02;
+      font-weight: 800;
+      letter-spacing: 0;
+      margin-bottom: 20px;
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: 1.17rem;
+      max-width: 620px;
+      margin-bottom: 30px;
+    }
+
+    .install-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      max-width: 680px;
+      width: 100%;
+    }
+
+    .install-box code {
+      color: var(--text);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      white-space: nowrap;
+      display: block;
+      min-width: 0;
+    }
+
+    .copy-btn, .btn {
+      border: 0;
+      border-radius: 8px;
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      font-family: Inter, sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 10px 14px;
+      white-space: nowrap;
+      transition: background 0.16s ease, transform 0.16s ease;
+    }
+
+    .copy-btn:hover, .btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .copy-btn.copied { background: var(--green); }
+
+    .btn.secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn.secondary:hover {
+      border-color: var(--accent);
+      background: var(--surface);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .terminal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+      min-width: 0;
+    }
+
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 16px;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .dot.red { background: #ff5f57; }
+    .dot.yellow { background: #febc2e; }
+    .dot.green { background: #28c840; }
+
+    .terminal-title {
+      margin-left: 8px;
+      color: var(--soft);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+    }
+
+    .terminal-body {
+      padding: 20px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      overflow-x: auto;
+      min-width: 0;
+    }
+
+    .prompt { color: var(--accent); }
+    .out { color: var(--muted); }
+    .ok { color: var(--green); }
+    .path { color: var(--blue); }
+    .warn { color: #facc15; }
+
+    section {
+      padding: 56px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-size: clamp(1.7rem, 4vw, 2.4rem);
+      line-height: 1.14;
+      margin-bottom: 14px;
+      letter-spacing: 0;
+    }
+
+    .section-copy {
+      color: var(--muted);
+      max-width: 700px;
+      margin-bottom: 28px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .feature {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px;
+    }
+
+    .feature h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .feature p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .step {
+      border-left: 3px solid var(--accent);
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 18px;
+    }
+
+    .step strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .step span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .usage-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .code-panel {
+      background: var(--code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      overflow-x: auto;
+      min-width: 0;
+    }
+
+    .code-panel pre {
+      color: var(--muted);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    footer {
+      padding: 34px 0 44px;
+      color: var(--soft);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    footer a {
+      color: var(--text);
+      text-decoration: underline;
+      text-decoration-color: var(--border);
+    }
+
+    @media (max-width: 860px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 42px;
+      }
+
+      .grid, .flow, .usage-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .container {
+        width: min(100% - 28px, 1120px);
+      }
+
+      .install-box {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .copy-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <a class="brand" href="#">codex<span>-review</span></a>
+        <div class="nav-links">
+          <a href="#install">Install</a>
+          <a href="#workflow">Workflow</a>
+          <a href="#usage">Usage</a>
+          <a href="https://github.com/jhubbardsf/codex-review">GitHub</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container hero">
+      <div>
+        <p class="eyebrow">Claude Code plugin</p>
+        <h1>Codex reviews without leaving Claude Code.</h1>
+        <p class="tagline">Package your second-opinion workflow: Claude implements, Codex GPT-5.5 reviews, and the findings come back into the same conversation.</p>
+
+        <div id="install" class="install-box">
+          <code id="installCommand">/plugin marketplace add jhubbardsf/codex-review</code>
+          <button class="copy-btn" onclick="copyInstall()">Copy</button>
+        </div>
+
+        <div class="actions">
+          <a class="btn" href="https://github.com/jhubbardsf/codex-review">View on GitHub</a>
+          <a class="btn secondary" href="https://github.com/jhubbardsf/codex-review#usage">Read the docs</a>
+        </div>
+      </div>
+
+      <div class="terminal" aria-label="Codex reviewer terminal preview">
+        <div class="terminal-header">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="terminal-title">Claude Code</span>
+        </div>
+        <div class="terminal-body">
+          <div><span class="prompt">/codex-reviewer:codex-reviewer</span></div>
+          <div class="out">Running Codex reviewer in: <span class="path">~/repo</span></div>
+          <div class="out">Target: uncommitted</div>
+          <div class="out">Model: gpt-5.5</div>
+          <br>
+          <div class="ok">Findings</div>
+          <div class="out">1. Missing retry guard in worker failure path</div>
+          <div class="out">2. Test gap around concurrent cache writes</div>
+          <br>
+          <div class="warn">Claude summarizes, you decide.</div>
+        </div>
+      </div>
+    </div>
+
+    <section id="workflow">
+      <div class="container">
+        <h2 class="section-title">A clean handoff between models</h2>
+        <p class="section-copy">The plugin keeps review as review. Codex reads the diff target, writes a report, and Claude preserves concrete file and line findings instead of pretending the report is automatically true.</p>
+
+        <div class="flow">
+          <div class="step">
+            <strong>1. Build</strong>
+            <span>Use Claude Code normally for implementation.</span>
+          </div>
+          <div class="step">
+            <strong>2. Invoke</strong>
+            <span>Run the namespaced reviewer skill.</span>
+          </div>
+          <div class="step">
+            <strong>3. Review</strong>
+            <span>Codex GPT-5.5 checks the selected git target.</span>
+          </div>
+          <div class="step">
+            <strong>4. Triage</strong>
+            <span>Claude reports findings, caveats, and test gaps.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2 class="section-title">Built for real repo work</h2>
+        <p class="section-copy">Use the same wrapper for quick local changes, branch diffs, single commits, or specific review instructions.</p>
+
+        <div class="grid">
+          <div class="feature">
+            <h3>Review-only default</h3>
+            <p>The skill tells Claude not to edit files unless the user separately asks for fixes.</p>
+          </div>
+          <div class="feature">
+            <h3>Portable plugin helper</h3>
+            <p>No personal paths. The executable ships in the plugin and is available through Claude's plugin PATH.</p>
+          </div>
+          <div class="feature">
+            <h3>Tested command surface</h3>
+            <p>Bun tests cover parser behavior, manifest shape, install docs, and wrapper failure modes.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="usage">
+      <div class="container">
+        <h2 class="section-title">Install once, invoke when needed</h2>
+        <p class="section-copy">After adding the marketplace, install the plugin and reload Claude Code plugins.</p>
+
+        <div class="usage-grid">
+          <div class="code-panel">
+            <pre><span class="prompt"># Install</span>
+/plugin marketplace add jhubbardsf/codex-review
+/plugin install codex-reviewer@codex-review
+/reload-plugins</pre>
+          </div>
+          <div class="code-panel">
+            <pre><span class="prompt"># Review targets</span>
+/codex-reviewer:codex-reviewer
+/codex-reviewer:codex-reviewer base origin/main
+/codex-reviewer:codex-reviewer commit abc1234
+/codex-reviewer:codex-reviewer custom Focus on auth bugs</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      Made by <a href="https://github.com/jhubbardsf">@jhubbardsf</a> · MIT License · <a href="https://github.com/jhubbardsf/codex-review">Source</a>
+    </div>
+  </footer>
+
+  <script>
+    async function copyInstall() {
+      const command = document.getElementById("installCommand").textContent;
+      const button = document.querySelector(".copy-btn");
+      try {
+        await navigator.clipboard.writeText(command);
+        button.textContent = "Copied";
+        button.classList.add("copied");
+        setTimeout(() => {
+          button.textContent = "Copy";
+          button.classList.remove("copied");
+        }, 1800);
+      } catch {
+        button.textContent = "Copy failed";
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "codex-reviewer",
+  "version": "0.1.0",
+  "description": "Run Codex GPT-5.5 as an independent code reviewer from Claude Code.",
+  "author": {
+    "name": "Josh Hubbard",
+    "email": "jhubbardsf@users.noreply.github.com",
+    "url": "https://github.com/jhubbardsf"
+  },
+  "homepage": "https://jhubbardsf.github.io/codex-review/",
+  "repository": "https://github.com/jhubbardsf/codex-review",
+  "license": "MIT",
+  "keywords": ["codex", "review", "code-review", "gpt-5.5", "claude-code"]
+}
+
