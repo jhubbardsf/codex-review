@@ -10,10 +10,9 @@ Install:
 
 ```text
 /plugin marketplace add jhubbardsf/codex-review
-/plugin install codex-reviewer@codex-review
+/plugin install codex-reviewer@joshd3v
 /reload-plugins
 /codex-reviewer:codex-reviewer
 ```
 
 Repo: https://github.com/jhubbardsf/codex-review
-

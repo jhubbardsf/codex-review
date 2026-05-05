@@ -23,9 +23,10 @@ claude plugin validate .
 
 ```text
 /plugin marketplace add ./path/to/codex-review
-/plugin install codex-reviewer@codex-review
+/plugin install codex-reviewer@joshd3v
 /reload-plugins
 /codex-reviewer:codex-reviewer
+/codex-reviewer:codex-review
 ```
 
 5. Check the GitHub Pages site.
@@ -48,10 +49,9 @@ git push origin main --tags
 
 ```text
 /plugin marketplace add jhubbardsf/codex-review
-/plugin install codex-reviewer@codex-review
+/plugin install codex-reviewer@joshd3v
 ```
 
 ## Version Notes
 
 Do not set a separate plugin version in `.claude-plugin/marketplace.json`. The plugin manifest version wins silently, so keeping a single source of truth avoids stale marketplace metadata masking a release.
-

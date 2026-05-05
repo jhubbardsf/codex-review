@@ -2,7 +2,7 @@
 set -euo pipefail
 
 MARKETPLACE_SOURCE="${CODEX_REVIEW_MARKETPLACE_SOURCE:-jhubbardsf/codex-review}"
-MARKETPLACE_NAME="${CODEX_REVIEW_MARKETPLACE_NAME:-codex-review}"
+MARKETPLACE_NAME="${CODEX_REVIEW_MARKETPLACE_NAME:-joshd3v}"
 PLUGIN_SPEC="${CODEX_REVIEW_PLUGIN_SPEC:-codex-reviewer@$MARKETPLACE_NAME}"
 SCOPE="${CODEX_REVIEW_INSTALL_SCOPE:-user}"
 
@@ -13,8 +13,8 @@ Usage:
 
 Environment overrides:
   CODEX_REVIEW_MARKETPLACE_SOURCE  Marketplace source. Default: jhubbardsf/codex-review
-  CODEX_REVIEW_MARKETPLACE_NAME    Marketplace name. Default: codex-review
-  CODEX_REVIEW_PLUGIN_SPEC         Plugin spec. Default: codex-reviewer@codex-review
+  CODEX_REVIEW_MARKETPLACE_NAME    Marketplace name. Default: joshd3v
+  CODEX_REVIEW_PLUGIN_SPEC         Plugin spec. Default: codex-reviewer@joshd3v
   CODEX_REVIEW_INSTALL_SCOPE       Install scope. Default: user
 USAGE
 }
@@ -72,4 +72,3 @@ Open Claude Code, run /reload-plugins, then use:
   /codex-reviewer:codex-reviewer
 
 EOF
-

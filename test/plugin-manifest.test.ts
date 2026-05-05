@@ -7,6 +7,7 @@ const marketplacePath = join(repoRoot, ".claude-plugin/marketplace.json");
 const pluginRoot = join(repoRoot, "plugins/codex-reviewer");
 const pluginManifestPath = join(pluginRoot, ".claude-plugin/plugin.json");
 const skillPath = join(pluginRoot, "skills/codex-reviewer/SKILL.md");
+const commandPath = join(pluginRoot, "commands/codex-review.md");
 const helperPath = join(pluginRoot, "bin/run-codex-review");
 
 function readJson(path: string) {
@@ -17,7 +18,7 @@ describe("Claude plugin packaging", () => {
   test("marketplace exposes the codex-reviewer plugin from a relative source", () => {
     const marketplace = readJson(marketplacePath);
 
-    expect(marketplace.name).toBe("codex-review");
+    expect(marketplace.name).toBe("joshd3v");
     expect(marketplace.plugins).toHaveLength(1);
     expect(marketplace.plugins[0].name).toBe("codex-reviewer");
     expect(marketplace.plugins[0].source).toBe("./plugins/codex-reviewer");
@@ -48,6 +49,17 @@ describe("Claude plugin packaging", () => {
     expect(skill).toContain("Do not edit files as part of this skill");
   });
 
+  test("compatibility command is available as a flat plugin command", () => {
+    const command = readFileSync(commandPath, "utf8");
+
+    expect(command).toStartWith("---\n");
+    expect(command).toContain("description:");
+    expect(command).toContain("argument-hint:");
+    expect(command).toContain("Bash(run-codex-review");
+    expect(command).toContain("run-codex-review $ARGUMENTS");
+    expect(command).toContain("do not edit files unless the user asks for fixes");
+  });
+
   test("helper is executable and portable", () => {
     const helper = readFileSync(helperPath, "utf8");
     const mode = statSync(helperPath).mode;
@@ -60,4 +72,3 @@ describe("Claude plugin packaging", () => {
     expect(helper).toContain("CODEX_REVIEW_CODEX_BIN");
   });
 });
-

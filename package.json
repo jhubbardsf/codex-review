@@ -1,6 +1,6 @@
 {
   "name": "codex-review",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Claude Code plugin marketplace for running Codex GPT-5.5 as an independent reviewer.",
@@ -16,4 +16,3 @@
     "bun": ">=1.0.0"
   }
 }
-

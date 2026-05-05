@@ -12,7 +12,7 @@ From inside Claude Code:
 
 ```text
 /plugin marketplace add jhubbardsf/codex-review
-/plugin install codex-reviewer@codex-review
+/plugin install codex-reviewer@joshd3v
 /reload-plugins
 ```
 
@@ -22,7 +22,14 @@ Then run:
 /codex-reviewer:codex-reviewer
 ```
 
-Claude Code plugin skills are namespaced by plugin name, so the installed skill is `/codex-reviewer:codex-reviewer`.
+Claude Code plugin install specs use `plugin@marketplace`. Here, `codex-reviewer` is the plugin name and `joshd3v` is the marketplace name from `.claude-plugin/marketplace.json`. Plugin skills and commands are namespaced by plugin name.
+
+Available slash entries:
+
+```text
+/codex-reviewer:codex-reviewer  # skill entry
+/codex-reviewer:codex-review    # compatibility command entry
+```
 
 ### One-line installer
 
@@ -53,6 +60,12 @@ curl -fsSL https://raw.githubusercontent.com/jhubbardsf/codex-review/main/instal
 /codex-reviewer:codex-reviewer base origin/main
 /codex-reviewer:codex-reviewer commit abc1234
 /codex-reviewer:codex-reviewer custom Review uncommitted changes and focus on retry safety
+```
+
+The compatibility command accepts the same arguments:
+
+```text
+/codex-reviewer:codex-review base origin/main
 ```
 
 By default, the helper reviews staged, unstaged, and untracked changes.
