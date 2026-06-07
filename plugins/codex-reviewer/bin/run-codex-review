@@ -10,7 +10,8 @@ Usage:
   run-codex-review [options] custom <review instructions...>
 
 Options:
-  --model <model>     Codex model to use. Default: CODEX_REVIEW_MODEL or gpt-5.5
+  --model <model>     Codex model to use. Default: CODEX_REVIEW_MODEL, else the
+                      model from your codex config (keeps model+provider in sync)
   --cwd <dir>         Repository directory. Default: current working directory
   --output <file>     Where to write the final Codex report. Default: temp file
   --no-ephemeral      Persist the Codex session instead of using --ephemeral
@@ -30,7 +31,13 @@ die() {
   exit 2
 }
 
-model="${CODEX_REVIEW_MODEL:-gpt-5.5}"
+# Empty by default so we inherit the model from the user's codex config, which
+# keeps `model` and `model_provider` consistent. Forcing a model name here (the
+# old default was gpt-5.5) while the config points at a provider that lacks that
+# deployment — e.g. Azure with only a gpt-5.4 deployment — makes codex request a
+# nonexistent deployment and the provider returns 404. Only override -m when the
+# caller explicitly asks via --model or CODEX_REVIEW_MODEL.
+model="${CODEX_REVIEW_MODEL:-}"
 codex_bin="${CODEX_REVIEW_CODEX_BIN:-codex}"
 cwd="$PWD"
 output=""
@@ -145,7 +152,10 @@ case "$mode" in
     ;;
 esac
 
-cmd=("$codex_bin" exec review -m "$model")
+cmd=("$codex_bin" exec review)
+if [[ -n "$model" ]]; then
+  cmd+=(-m "$model")
+fi
 if ((ephemeral)); then
   cmd+=(--ephemeral)
 fi
@@ -157,7 +167,7 @@ fi
 
 echo "Running Codex reviewer in: $cwd" >&2
 echo "Target: $mode${target_value:+ $target_value}" >&2
-echo "Model: $model" >&2
+echo "Model: ${model:-<codex config default>}" >&2
 echo "Report: $output" >&2
 
 (

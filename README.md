@@ -49,7 +49,7 @@ curl -fsSL https://raw.githubusercontent.com/jhubbardsf/codex-review/main/instal
 
 - Claude Code with plugin support
 - Codex CLI installed and authenticated
-- Access to the selected Codex model, defaulting to `gpt-5.5`
+- Access to the selected Codex model (defaults to your `codex` config's model and provider)
 - A git repository to review
 
 ## Usage
@@ -85,7 +85,7 @@ Options:
 
 | Option | Description |
 | --- | --- |
-| `--model <model>` | Codex model to use. Defaults to `CODEX_REVIEW_MODEL` or `gpt-5.5`. |
+| `--model <model>` | Codex model to use. Defaults to `CODEX_REVIEW_MODEL`, or your `codex` config's model when unset (which keeps the model paired with its `model_provider`). |
 | `--cwd <dir>` | Repository directory. Defaults to the current working directory. |
 | `--output <file>` | Write the final Codex report to a specific path. |
 | `--no-ephemeral` | Persist the Codex session instead of passing `--ephemeral`. |

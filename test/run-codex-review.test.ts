@@ -43,18 +43,27 @@ afterEach(() => {
 });
 
 describe("run-codex-review", () => {
-  test("defaults to an ephemeral uncommitted review with GPT-5.5", () => {
+  test("defaults to an ephemeral uncommitted review using the codex config model", () => {
     const { repo, logPath, env } = setup();
-    const result = runReview([], { cwd: repo, env });
+    // Pin CODEX_REVIEW_MODEL empty so the test is hermetic regardless of the
+    // runner's shell environment (runReview spreads process.env).
+    const result = runReview([], {
+      cwd: repo,
+      env: { ...env, CODEX_REVIEW_MODEL: "" }
+    });
 
     expect(result.status).toBe(0);
     expect(result.stdout).toContain("fake Codex review report");
     expect(result.stderr).toContain("Target: uncommitted");
-    expect(result.stderr).toContain("Model: gpt-5.5");
+    // With no explicit model, the helper must NOT pass -m so that codex uses its
+    // configured model+provider pair (passing only -m, e.g. gpt-5.5, against an
+    // Azure provider that lacks that deployment yields a 404).
+    expect(result.stderr).toContain("Model: <codex config default>");
     const args = readArgsLog(logPath);
-    for (const expected of ["exec", "review", "-m", "gpt-5.5", "--ephemeral", "--uncommitted"]) {
+    for (const expected of ["exec", "review", "--ephemeral", "--uncommitted"]) {
       expect(args).toContain(expected);
     }
+    expect(args).not.toContain("-m");
   });
 
   test("uses CODEX_REVIEW_MODEL when --model is not passed", () => {
