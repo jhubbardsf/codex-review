@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-MARKETPLACE_SOURCE="${CODEX_REVIEW_MARKETPLACE_SOURCE:-jhubbardsf/codex-review}"
+MARKETPLACE_SOURCE="${CODEX_REVIEW_MARKETPLACE_SOURCE:-jhubbardsf/claude-plugins}"
 MARKETPLACE_NAME="${CODEX_REVIEW_MARKETPLACE_NAME:-joshd3v}"
 PLUGIN_SPEC="${CODEX_REVIEW_PLUGIN_SPEC:-codex-reviewer@$MARKETPLACE_NAME}"
 SCOPE="${CODEX_REVIEW_INSTALL_SCOPE:-user}"
@@ -12,7 +12,7 @@ Usage:
   install.sh [--scope user|project|local]
 
 Environment overrides:
-  CODEX_REVIEW_MARKETPLACE_SOURCE  Marketplace source. Default: jhubbardsf/codex-review
+  CODEX_REVIEW_MARKETPLACE_SOURCE  Marketplace source. Default: jhubbardsf/claude-plugins
   CODEX_REVIEW_MARKETPLACE_NAME    Marketplace name. Default: joshd3v
   CODEX_REVIEW_PLUGIN_SPEC         Plugin spec. Default: codex-reviewer@joshd3v
   CODEX_REVIEW_INSTALL_SCOPE       Install scope. Default: user

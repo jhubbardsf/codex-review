@@ -18,7 +18,7 @@ describe("Claude plugin packaging", () => {
   test("marketplace exposes the codex-reviewer plugin from a relative source", () => {
     const marketplace = readJson(marketplacePath);
 
-    expect(marketplace.name).toBe("joshd3v");
+    expect(marketplace.name).toBe("codex-review");
     expect(marketplace.plugins).toHaveLength(1);
     expect(marketplace.plugins[0].name).toBe("codex-reviewer");
     expect(marketplace.plugins[0].source).toBe("./plugins/codex-reviewer");

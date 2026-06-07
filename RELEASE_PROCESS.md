@@ -23,7 +23,7 @@ claude plugin validate .
 
 ```text
 /plugin marketplace add ./path/to/codex-review
-/plugin install codex-reviewer@joshd3v
+/plugin install codex-reviewer@codex-review
 /reload-plugins
 /codex-reviewer:codex-reviewer
 /codex-reviewer:codex-review
@@ -49,7 +49,7 @@ git push origin main --tags
 
 ```text
 /plugin marketplace add jhubbardsf/codex-review
-/plugin install codex-reviewer@joshd3v
+/plugin install codex-reviewer@codex-review
 ```
 
 ## Version Notes

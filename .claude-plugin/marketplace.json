@@ -1,8 +1,8 @@
 {
-  "name": "joshd3v",
+  "name": "codex-review",
   "owner": {
     "name": "Josh Hubbard",
-    "email": "jhubbardsf@users.noreply.github.com"
+    "email": "josh@joshuahubbard.dev"
   },
   "description": "Claude Code plugins for delegating review work to Codex.",
   "plugins": [

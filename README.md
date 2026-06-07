@@ -11,10 +11,12 @@ Run Codex GPT-5.5 as an independent reviewer from Claude Code.
 From inside Claude Code:
 
 ```text
-/plugin marketplace add jhubbardsf/codex-review
+/plugin marketplace add jhubbardsf/claude-plugins
 /plugin install codex-reviewer@joshd3v
 /reload-plugins
 ```
+
+The `joshd3v` marketplace is Josh's umbrella catalog covering all his plugins, hosted at [jhubbardsf/claude-plugins](https://github.com/jhubbardsf/claude-plugins).
 
 Then run:
 
@@ -22,7 +24,17 @@ Then run:
 /codex-reviewer:codex-reviewer
 ```
 
-Claude Code plugin install specs use `plugin@marketplace`. Here, `codex-reviewer` is the plugin name and `joshd3v` is the marketplace name from `.claude-plugin/marketplace.json`. Plugin skills and commands are namespaced by plugin name.
+#### Direct repo install
+
+You can also add this repository directly as a marketplace:
+
+```text
+/plugin marketplace add jhubbardsf/codex-review
+/plugin install codex-reviewer@codex-review
+/reload-plugins
+```
+
+Claude Code plugin install specs use `plugin@marketplace`. Here, `codex-reviewer` is the plugin name; the marketplace name is `joshd3v` when installing through the umbrella catalog, or `codex-review` (this repo's embedded marketplace from `.claude-plugin/marketplace.json`) when adding the repo directly. Plugin skills and commands are namespaced by plugin name.
 
 Available slash entries:
 

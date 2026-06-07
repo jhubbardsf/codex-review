@@ -11,8 +11,10 @@ describe("documentation and Pages site", () => {
   test("README documents install, usage, prerequisites, and tests", () => {
     const readme = read("README.md");
 
-    expect(readme).toContain("/plugin marketplace add jhubbardsf/codex-review");
+    expect(readme).toContain("/plugin marketplace add jhubbardsf/claude-plugins");
     expect(readme).toContain("/plugin install codex-reviewer@joshd3v");
+    expect(readme).toContain("/plugin marketplace add jhubbardsf/codex-review");
+    expect(readme).toContain("/plugin install codex-reviewer@codex-review");
     expect(readme).toContain("/codex-reviewer:codex-reviewer");
     expect(readme).toContain("/codex-reviewer:codex-review");
     expect(readme).toContain("Codex CLI");
@@ -25,7 +27,7 @@ describe("documentation and Pages site", () => {
 
     expect(html).toContain("<meta name=\"viewport\"");
     expect(html).toContain("codex-review");
-    expect(html).toContain("/plugin marketplace add jhubbardsf/codex-review");
+    expect(html).toContain("/plugin marketplace add jhubbardsf/claude-plugins");
     expect(html).toContain("/plugin install codex-reviewer@joshd3v");
     expect(html).toContain("/codex-reviewer:codex-reviewer");
     expect(html).toContain("/codex-reviewer:codex-review");

@@ -5,7 +5,7 @@
   "description": "Run Codex GPT-5.5 as an independent code reviewer from Claude Code.",
   "author": {
     "name": "Josh Hubbard",
-    "email": "jhubbardsf@users.noreply.github.com",
+    "email": "josh@joshuahubbard.dev",
     "url": "https://github.com/jhubbardsf"
   },
   "homepage": "https://jhubbardsf.github.io/codex-review/",
